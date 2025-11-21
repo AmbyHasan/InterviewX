@@ -1,0 +1,305 @@
+/* -----------------------------------------
+   TAILWIND v4 BASE IMPORTS
+------------------------------------------ */
+@import "tailwindcss";
+
+/* -----------------------------------------
+   ROOT THEME VARIABLES
+------------------------------------------ */
+:root {
+  --radius: 0.625rem;
+
+  --color-success-100: #49de50;
+  --color-success-200: #42c748;
+
+  --color-destructive-100: #f75353;
+  --color-destructive-200: #c44141;
+
+  --color-primary-100: #dddfff;
+  --color-primary-200: #cac5fe;
+
+  --color-light-100: #d6e0ff;
+  --color-light-400: #6870a6;
+  --color-light-600: #4f557d;
+  --color-light-800: #24273a;
+
+  --color-dark-100: #020408;
+  --color-dark-200: #27282f;
+  --color-dark-300: #242633;
+
+  --font-mona-sans: "Mona Sans", sans-serif;
+
+  --bg-pattern: url("/pattern.png");
+
+  /* Light mode default tokens */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+
+  /* Chart */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Sidebar */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* -----------------------------------------
+   DARK MODE TOKEN OVERRIDES
+------------------------------------------ */
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: var(--color-light-100);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* -----------------------------------------
+   BASE STYLES
+------------------------------------------ */
+* {
+  border-color: var(--border);
+  outline-color: var(--ring);
+  outline-width: 1px;
+  outline-offset: -1px;
+}
+
+body {
+  background-color: var(--background);
+  background-image: var(--bg-pattern);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: var(--foreground);
+}
+
+p {
+  color: var(--color-light-100);
+}
+
+h2 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+}
+
+ul {
+  list-style-type: disc;
+  list-style-position: inside;
+}
+
+li {
+  color: var(--color-light-100);
+}
+
+/* -----------------------------------------
+   BUTTONS & COMPONENTS
+------------------------------------------ */
+.btn-call {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: white;
+  background-color: var(--color-success-100);
+  border-radius: 9999px;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-width: 7rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-disconnect {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: white;
+  background-color: var(--color-destructive-100);
+  border-radius: 9999px;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 7rem;
+}
+
+.btn-primary {
+  background-color: var(--color-primary-200);
+  color: var(--color-dark-100);
+  border-radius: 9999px;
+  font-weight: 700;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+
+.btn-secondary {
+  background-color: var(--color-dark-200);
+  color: var(--color-primary-200);
+  border-radius: 9999px;
+  font-weight: 700;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-dark-200) / 0.8;
+}
+
+.btn-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  width: 100%;
+  border-radius: 0.375rem;
+  background-color: var(--color-dark-200);
+  cursor: pointer;
+  border: 1px solid var(--input);
+  padding: 0 1.25rem;
+}
+
+/* -----------------------------------------
+   CARD STYLES
+------------------------------------------ */
+.card-border {
+  background: linear-gradient(to bottom, #4B4D4F, #4B4D4F33);
+  padding: 0.125rem;
+  border-radius: 1rem;
+  width: fit-content;
+}
+
+.card {
+  background: linear-gradient(to bottom, #1A1C20, #08090D);
+  border-radius: 1rem;
+  min-height: 100%;
+}
+
+/* -----------------------------------------
+   LAYOUT UTILITIES
+------------------------------------------ */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blue-gradient-dark {
+  background: linear-gradient(to bottom, #171532, #08090D);
+}
+
+.blue-gradient {
+  background: linear-gradient(to left, white, #CAC5FE);
+}
+
+/* -----------------------------------------
+   AUTH LAYOUT
+------------------------------------------ */
+.auth-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80rem;
+  min-height: 100vh;
+}
+
+@media (max-width: 640px) {
+  .auth-layout {
+    padding: 2rem 1rem;
+  }
+}
+
+/* -----------------------------------------
+   BUTTON
+------------------------------------------ */
+.btn {
+  width: 100% !important;
+  background-color: var(--color-primary-200) !important;
+  color: var(--color-dark-100) !important;
+  border-radius: 9999px !important;
+  min-height: 2.5rem !important;
+  font-weight: 700 !important;
+  padding: 0 1.25rem !important;
+  cursor: pointer !important;
+}
+
+/* -----------------------------------------
+   ANIMATIONS
+------------------------------------------ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
