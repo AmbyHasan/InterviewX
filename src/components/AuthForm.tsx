@@ -10,24 +10,31 @@ import Link from "next/link";
 import {toast} from "sonner";
 import FormField from "./FormField"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { ApiResponse } from "../types/ApiResponse"
+import { AxiosError } from "axios";
+import axios from "axios";
+import { signIn } from "next-auth/react";
 
 
 //defining the zod schema for sign in and sign up
 const authFormSchema= (type:FormType)=>{
   return z.object({
-    name: type==="sign-up" ? z.string().min(3 ).max(30) : z.string().optional() , //we will have the name field only in sign up form
+    name: type==="sign-up" ? z.string().min(3,{message : "Name must atleast have 3 characters"} ).max(50 , {message:"Name cannot exceed the length 50"}) : z.string().optional() , //we will have the name field only in sign up form
     email: z.email({message:"Invalid Email Address"}) ,
     password:z.string().min(6 ,{message: "Password must be atleast 6 characters long"}) ,
 
     })
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------------------------------
 
 const AuthForm = ({type}:{type:FormType}) => {
 
     const formSchema= authFormSchema(type) ;
     const router=useRouter();
+    
+   const[isSubmitting, setIsSubmitting]=useState(false);
 
    const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,25 +45,79 @@ const AuthForm = ({type}:{type:FormType}) => {
     },
   })
  
+
   //here we will write the function that we want to be performed when the user submits the form
-  function onSubmit(values: z.infer<typeof formSchema>) {
+ async function onSubmit(data: z.infer<typeof formSchema>) {
+
+  
       try{
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+   //function for sign-up
         if(type==="sign-up"){
+          setIsSubmitting(true);
+
+         try{
+            //send the data to the backend
+         const response=  await axios.post<ApiResponse>("/api/sign-up" , data);
+         console.log(response.data.message);
+         
           toast.success("Account created successfully ,Please SignIn !!")
           router.push("/sign-in");
-          console.log("Sign up credentials" ,values);
-      
-        }else{
-            toast.success("Signed in successfully!!")
-            console.log("Sign in credentials" ,values);
-            router.push("/");
+          console.log("Sign up credentials" ,data);
+         
+       
+       
+        }catch(error){
+           console.error("Error in signing up the user" ,error);
+           const axiosError= error as AxiosError<ApiResponse>;
+           let errorMessage = axiosError.response?.data.message;
+           toast(errorMessage);
+           router.push("/sign-up");
+        }finally{
+        setIsSubmitting(false);
         }
+
+
+      
+
+//------------------------------------------------------------------------------------------------------------------
+
+//when the type is of sign-in
+
+        }else{
+
+           
+   const result=  await signIn("credentials" , {
+        redirect:false,
+        identifier: data.email, //email is our indentifier
+        password: data.password
+     })
+    if(result?.error){
+        toast("Login failed");
+    }
+    //we get sign in url after successful login
+   if (result?.url) {
+   toast.success("Signed in successfully!");
+   router.replace("/");
+}}
+
+
 
       }catch(error){
         console.log(error);
         toast.error(`There was an error:${error}`);
       }}
   
+
+
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------
+
+ //variable
   const isSignIn = type=== "sign-in"
   return (
 
@@ -96,6 +157,27 @@ const AuthForm = ({type}:{type:FormType}) => {
 
    
         <Button type="submit" className="btn">{isSignIn ? "Sign In" : "Create an Account"}</Button>
+
+        <div className="flex flex-col gap-4 w-full mt-4">
+  <Button
+    type="button"
+    className="btn-secondary w-full rounded-full"
+    onClick={() => signIn("google", { callbackUrl: "/" })}
+  >
+    <Image src="/google.svg" width={20} height={20} alt="google" className="mr-2" />
+    Sign in with Google
+  </Button>
+
+  <Button
+    type="button"
+    className="btn-secondary w-full rounded-full"
+    onClick={() => signIn("github", { callbackUrl: "/" })}
+  >
+    <Image src="/github.svg" width={20} height={20} alt="github" className="mr-2" />
+    Sign in with GitHub
+  </Button>
+</div>
+
       </form>
         </Form>
         <p className="text-center">
