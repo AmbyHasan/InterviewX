@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react';
 import { AgentProps } from '../types';
 import { useRouter } from 'next/router';
-import { vapi } from '../lib/vapi.sdk';
+import { vapi } from '../lib/vapi';
 
 
 
