@@ -5,6 +5,7 @@ import {google} from "@ai-sdk/google";
 import { generateText } from 'ai';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
+import mongoose from "mongoose";
 
 //api for generating the questions based on the inputs given by the user to vapi
 
@@ -12,7 +13,7 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 export async function POST(request:Request){
 
     const {type , role , level , techstack ,amount ,userid }=await request.json();
-
+    console.log("user id is" , userid);
      await dbConnect();
   try {
 
@@ -55,7 +56,7 @@ try {
       amount:amount ,
       techstack: techstack.split(",") ,
       questions: parsedQuestions, //the ai will return the questions in string format , we are parsing it into an array
-      userId: userid,
+      userId: new mongoose.Types.ObjectId(userid) ,
       finalized: true,
       coverImage: getRandomInterviewCover(), //cover image of the company by which we are getting interviewed ,this function will directly return us the link so we do not need cloudinary or multer
       createdAt: new Date().toISOString(),
@@ -68,7 +69,7 @@ try {
 
     
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error from vapi:", error);
     return Response.json({ success: false, error: error }, { status: 500 });
   }
 }
