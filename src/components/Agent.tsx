@@ -55,6 +55,7 @@ const Agent = ({userName ,userId ,type}:AgentProps) => {
     vapi.on("call-start" , onCallStart);
     vapi.on("call-end" ,onCallEnd);
     vapi.on("message" ,onMessage);
+    vapi.on("speech-start" ,onSpeechStart);
     vapi.on("speech-end" ,onSpeechEnd);
     vapi.on("error" , onError );
 
@@ -63,6 +64,7 @@ const Agent = ({userName ,userId ,type}:AgentProps) => {
     vapi.off("call-start" , onCallStart);
     vapi.off("call-end" ,onCallEnd);
     vapi.off("message" ,onMessage);
+    vapi.on("speech-start" ,onSpeechStart);
     vapi.off("speech-end" ,onSpeechEnd);
     vapi.off("error" , onError );
     }
