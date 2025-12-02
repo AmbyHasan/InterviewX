@@ -6,6 +6,7 @@ import { AgentProps } from '../types';
 import { useRouter } from 'next/navigation';
 import { vapi } from '../lib/vapi';
 import { cn } from '../lib/utils';
+import { interviewer } from '../constants';
 
 
 
@@ -24,13 +25,14 @@ interface SavedMessage{
 
 
 
-const Agent = ({userName ,userId ,type}:AgentProps) => {
+const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
 
   const router=useRouter();
   const [isSpeaking ,setIsSpeaking]=useState(false);
   const [callStatus , setCallStatus]=useState<CallStatus>(CallStatus.INACTIVE);
   const [messages , setMessages]=useState<SavedMessage[]>([]);
   
+  //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
   useEffect(()=>{
 
@@ -64,36 +66,88 @@ const Agent = ({userName ,userId ,type}:AgentProps) => {
     vapi.off("call-start" , onCallStart);
     vapi.off("call-end" ,onCallEnd);
     vapi.off("message" ,onMessage);
-    vapi.on("speech-start" ,onSpeechStart);
+    vapi.off("speech-start" ,onSpeechStart);
     vapi.off("speech-end" ,onSpeechEnd);
     vapi.off("error" , onError );
     }
   } ,[])
+      
+//------------------------------------------------------------------------------------------------------------------------------------------------
+  const handleGenerateFeedback=async(messages:SavedMessage[])=>{
+      console.log("Generate Feedback here");
 
+       //mock message
+      const {success , id}={
+        success:true ,
+        id: "feedback-id"
+
+      }
+
+      if(success && id){
+          router.push(`/interview/${interviewId}/feedback`)
+      }else{
+        console.log("Error saving feedback");
+        router.push("/");
+      }
+  }
+
+  //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
  //after the call ends take the user back to the home page so that they can see their fully generated interview
   useEffect(()=>{
-      if(callStatus==CallStatus.FINISHED) router.push("/");
+      if(callStatus===CallStatus.FINISHED){
+        //generate the interview and push the user to the home page
+        if(type==="generate"){
+          router.push('/');
+        }else{
+          handleGenerateFeedback(messages);
+        }
+      }
+     
   } ,[messages ,callStatus , type , userId]);
 
+  //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
    //start the call function
   const handleCall=async()=>{
+
+
     setCallStatus(CallStatus.CONNECTING);
+
     console.log("Sending to VAPI:", {
    username: userName,
      userid: userId
     });
 
 
-    await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID ,{
+   if(type==="generate"){
+       await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID ,{
        variableValues:{
        username:userName,
        userid:userId
        }
-  
-
     });
+   }else{
+
+    //we will provide the array of questions for the interviewer to ask
+    let formattedQuestions="";
+
+    if(questions){
+
+       formattedQuestions=questions.map((question)=>`-${question}`).join('\n');
+         }
+    
+    await vapi.start(interviewer ,{
+      variableValues:{
+      questions:formattedQuestions
+      }
+    })
+    
+
+
+   }
+
+    
     
   }
  

@@ -111,3 +111,18 @@ declare module "next-auth/jwt" {
     name: string;
   }
 }
+
+export interface Interview extends Document{
+  _id:Types.ObjectId;
+  role: string;
+  type: string;
+  level: string;
+  techstack: string[];
+  questions: string[];
+  userId: Types.ObjectId | string;
+  finalized: boolean;
+  coverImage: string;
+  amount:number ,
+  createdAt :Date;
+  updatedAt: Date
+}

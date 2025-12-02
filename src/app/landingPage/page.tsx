@@ -75,37 +75,45 @@ export default function landingPage() {
   };
 
   const features = [
-    {
-      icon: '🤖',
-      title: 'AI-Powered Analysis',
-      description: 'Advanced machine learning algorithms analyze candidate responses in real-time, providing instant feedback and insights.'
-    },
-    {
-      icon: '📊',
-      title: 'Smart Analytics',
-      description: 'Comprehensive dashboards and reports help you make data-driven hiring decisions with confidence.'
-    },
-    {
-      icon: '🎯',
-      title: 'Custom Questions',
-      description: 'Create tailored interview scenarios that match your specific job requirements and company culture.'
-    },
-    {
-      icon: '🔒',
-      title: 'Secure & Private',
-      description: 'Enterprise-grade security ensures your interview data remains confidential and protected.'
-    },
-    {
-      icon: '⚡',
-      title: 'Real-Time Feedback',
-      description: 'Get instant insights during interviews to adapt your approach and dig deeper into key topics.'
-    },
-    {
-      icon: '🌐',
-      title: 'Global Reach',
-      description: 'Conduct interviews across time zones with multilingual support and seamless video integration.'
-    }
-  ];
+   {
+    icon: '🤖',
+    title: 'AI-Powered Interviewing',
+    description:
+      'Practice real interview questions generated on the spot by advanced AI tailored to your role and tech stack.'
+  },
+  {
+    icon: '📊',
+    title: 'Smart Performance Analytics',
+    description:
+      'Get detailed insights on your answers, including accuracy, clarity, confidence level, and improvement areas.'
+  },
+  {
+    icon: '🎯',
+    title: 'Role-Based Question Sets',
+    description:
+      'Choose roles, levels, and tech stacks to get highly relevant questions for your dream job.'
+  },
+  {
+    icon: '🔒',
+    title: 'Secure & Private Practice',
+    description:
+      'Your interview attempts, recordings, and feedback remain fully private and protected.'
+  },
+  {
+    icon: '⚡',
+    title: 'Instant Feedback & Scoring',
+    description:
+      'Receive AI-generated feedback, strengths, weaknesses, and an overall score immediately after each interview.'
+  },
+  {
+    icon: '🧠',
+    title: 'Continuous Skill Improvement',
+    description:
+      'Track your progress across multiple interviews and see where you’re getting stronger over time.'
+  }
+];
+
+  
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -218,8 +226,7 @@ export default function landingPage() {
               src="logo.png" 
               alt="InterviewX Logo" 
               className="fade-soft"
-            //   style={{ filter: 'drop-shadow(0 0 30px rgba(59, 130, 246, 0.6))' }}
-            />
+          ></img>
           </div>
           
           <h1 className="text-6xl font-bold mb-5 text-white shimmer-text">InterviewX</h1>

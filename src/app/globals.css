@@ -192,6 +192,11 @@ li {
   cursor: pointer;
   min-height: 2.5rem;
 }
+.btn-primary:hover {
+  background-color: gray;
+  
+}
+
 
 .btn-secondary {
   background-color: var(--color-dark-200);

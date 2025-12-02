@@ -1,19 +1,7 @@
 import mongoose ,{Schema , Document  ,Types} from "mongoose";
+import { Interview } from "../types";
 
-export interface Interview extends Document{
-  _id:Types.ObjectId;
-  role: string;
-  type: string;
-  level: string;
-  techstack: string[];
-  questions: string[];
-  userId: Types.ObjectId | string;
-  finalized: boolean;
-  coverImage: string;
-  amount:number ,
-  createdAt :Date;
-  updatedAt: Date
-}
+
 
 const InterviewSchema : Schema<Interview>= new Schema({
  role:{
@@ -43,8 +31,9 @@ const InterviewSchema : Schema<Interview>= new Schema({
       required: true,
     },
     amount:{
-  type:Number ,
-  required:true
+ 
+      type:Number ,
+      required:true
     } ,
  
   finalized: Boolean ,
