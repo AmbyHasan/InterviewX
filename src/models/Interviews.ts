@@ -1,8 +1,6 @@
 import mongoose ,{Schema , Document  ,Types} from "mongoose";
 import { Interview } from "../types";
 
-
-
 const InterviewSchema : Schema<Interview>= new Schema({
  role:{
       type:String , 

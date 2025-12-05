@@ -13,6 +13,10 @@ export const authOptions: NextAuthOptions={
    adapter: MongoDBAdapter(clientPromise),
     providers:[
           //giving the strategies that i want to use for authentication
+
+
+
+          //strategy-1
         CredentialsProvider({
 
             id: "credentials" ,
@@ -53,10 +57,14 @@ export const authOptions: NextAuthOptions={
 
 
                 }}}) ,
-         GoogleProvider({
+
+  //strategy-2
+  GoogleProvider({
     clientId: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
   }),
+
+  //strategy-3
   GitHubProvider({
     clientId: process.env.GITHUB_CLIENT_ID!,
     clientSecret: process.env.GITHUB_CLIENT_SECRET!,
@@ -78,6 +86,7 @@ export const authOptions: NextAuthOptions={
 
   // Case 2: OAuth login → user._id does NOT exist
   if (!token._id && token.email) {
+    //since the email exists it means that the user is in the database  ,now hop inside the mongodb and get the user id from there
     const existingUser = await UserModel.findOne({ email: token.email });
 
     if (existingUser) {
@@ -88,6 +97,8 @@ export const authOptions: NextAuthOptions={
   }
             return token;
         },
+
+        
         //token se jo bhi info mili wo session me shift krdi
          async session({session  ,token}: {session: any, token: JWT}){
 

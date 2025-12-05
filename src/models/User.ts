@@ -34,8 +34,6 @@ const UserSchema : Schema<User>=new mongoose.Schema({
 
 
 
-
-
 //next js ko ye nhi pata hota ki ye meri application first time run ho rhi hai ya pehle se boot up hochuki hai
 //isiliye while creating UserModel we will first check ki kya ye pehle se bana hua hai  ?? otherwise bana do 
 
@@ -48,7 +46,7 @@ export default UserModel;
 //for extracting the current user from the sessions
 export  async function getCurrentUser(){
   await dbConnect();
-    const session=await getServerSession(authOptions);
+   const session=await getServerSession(authOptions);
    const userId = session?.user?._id;
    if (!userId) return null;
     const user = await UserModel.findById(userId).select("-password");
