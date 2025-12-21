@@ -6,16 +6,17 @@ import { Button } from './ui/button';
 import Link from 'next/link';
 import DisplayTechIcons from './DisplayTechIcons';
 import { InterviewCardProps } from '../types';
-import { Feedback } from '../types';
+import { FeedbackType } from '../types';
+import { getFeedbackByInterviewId } from '../lib/action';
 
-const InterviewCard = ({interviewId , userId , role , type , techstack , createdAt}: InterviewCardProps) => {
+const InterviewCard = async({interviewId , userId , role , type , techstack , createdAt}: InterviewCardProps) => {
 
-  const feedback=null as Feedback | null ;
+  const feedback=userId && interviewId ? await getFeedbackByInterviewId({interviewId , userId }): null ;
   const normalizedType= /mix/gi.test(type) ? "Mixed" : type;
   const formattedDate=dayjs(feedback?.createdAt || createdAt?.toString() || Date.now()).format("DD/MM/YYYY");
 
   return (
-    <div className="card-border w-[360px] max-sm:w-full min-h-96 m-3 bg-[#0B0F24] 
+    <div className="card-border w-90 max-sm:w-full min-h-96 m-3 bg-[#0B0F24] 
          cursor-pointer transition-all duration-300 
             hover:-translate-y-2 
             hover:shadow-[0_0_25px_5px_rgba(56,189,248,0.35)] 

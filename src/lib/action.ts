@@ -1,12 +1,12 @@
 "use server";
-import { GetLatestInterviewsParams} from "@/src/types";
+import { FeedbackType, GetFeedbackByInterviewIdParams, GetLatestInterviewsParams} from "@/src/types";
 import { Interview } from "@/src/types";
 import Interviews from "../models/Interviews";
 import dbConnect from "./dbConnect";
 import { CreateFeedbackParams } from "@/src/types";
-import { generateObject } from "ai";
 import { feedbackSchema } from "../constants";
-import { google } from "@ai-sdk/google";
+import Feedback from "../models/Feedback";
+import { groq } from "./groq";
 
 
 
@@ -49,6 +49,7 @@ await dbConnect();
 //function for creating the feedback
 export async function createFeedBack(params : CreateFeedbackParams){
     const {interviewId , userId , transcript}=params;
+    await dbConnect();
 
     try{
 
@@ -57,27 +58,157 @@ export async function createFeedBack(params : CreateFeedbackParams){
         )).join(" ");
 
 
-        const {object:{totalScore , categoryScores , strengths , areasForImprovement , finalAssessment}}= await generateObject({
-      model: google("gemini-2.0-flash-001"),
-      schema: feedbackSchema,
-      prompt: `
+    //we will give the interview transcript to the AI and the AI will generate the feedback based on the user's responses
+   
+   const   prompt= `
         You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
         Transcript:
         ${formattedTranscript}
 
-        Please score the candidate from 0 to 100 in the following areas. Do not add categories other than the ones provided:
-        - **Communication Skills**: Clarity, articulation, structured responses.
-        - **Technical Knowledge**: Understanding of key concepts for the role.
-        - **Problem-Solving**: Ability to analyze problems and propose solutions.
-        - **Cultural & Role Fit**: Alignment with company values and job role.
-        - **Confidence & Clarity**: Confidence in responses, engagement, and clarity.
-        `,
-      system:
-        "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
+       Score the candidate from 0 to 100 in each category and provide a short comment for each score. Use only the categories below (do not add or rename):
+      - Communication Skills
+      - Technical Knowledge
+      - Problem Solving
+      - Cultural Fit
+      - Confidence and Clarity
+
+
+- totalScore (number)
+- strengths (array of strings)
+- areasForImprovement (array of strings)
+- finalAssessment (1–3 sentences)
+
+Return ONLY valid JSON that matches this structure exactly.
+Do NOT include explanations, comments, markdown, or extra text.
+Do NOT include anything before or after the JSON.
+`;
+const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: "You are a strict professional interviewer." },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.3,
     });
 
-    }catch(e){
-        console.log("Error displaying feedback" , e);
-    }
 
+    //this is feedback response returned by the AI , ssfely extract the output from it
+const rawText = completion.choices[0]?.message?.content;
+
+    if (!rawText) throw new Error("No response from Groq");
+
+    console.log("groq output :" , rawText);
+   //parsing the json returned by groq
+    function extractJson(text: string) {
+  const match = text.match(/\{[\s\S]*\}$/);
+  if (!match) throw new Error("No valid JSON found in AI response");
+  return JSON.parse(match[0]);
+}
+
+const parsed = extractJson(rawText);
+
+//output by ai
+console.log("RAW PARSED AI OUTPUT:", parsed);
+ //NORMALIZING THE OUTPUT BY AI
+ const categoryScores = Array.isArray(parsed.categoryScores)
+  ? parsed.categoryScores.map((c: any) => ({
+      name: c.name ?? "Unknown",
+      score: Number(c.score ?? 0),
+      comment: c.comment ?? ""
+    }))
+  : [
+      { name: "Communication Skills", score: 0, comment: "AI did not return this category." },
+      { name: "Technical Knowledge", score: 0, comment: "AI did not return this category." },
+      { name: "Problem Solving", score: 0, comment: "AI did not return this category." },
+      { name: "Cultural Fit", score: 0, comment: "AI did not return this category." },
+      { name: "Confidence and Clarity", score: 0, comment: "AI did not return this category." }
+    ];
+
+const totalScore = Math.round(
+  categoryScores.reduce((sum : Number, c:any) => sum + c.score, 0) /
+  categoryScores.length
+);
+
+   
+const normalized = {
+ 
+  totalScore,               
+
+  categoryScores,
+
+  strengths: Array.isArray(parsed.strengths)
+    ? parsed.strengths.filter(Boolean)
+    : [],
+
+  areasForImprovement: Array.isArray(parsed.areasForImprovement)
+    ? parsed.areasForImprovement.filter(Boolean)
+    : [],
+
+  finalAssessment:
+    typeof parsed.finalAssessment === "string"
+      ? parsed.finalAssessment
+      : "Assessment unavailable."
+};
+
+    const result= feedbackSchema.safeParse(normalized);
+    if (!result.success) {
+  console.error("ZOD ERROR:",result.error);
+  return {
+    success: false,
+    feedbackId: null,
+  };
+}
+
+const feedback = result.data;
+
+    // save to the database
+    const savedFeedback = await Feedback.create({
+      interviewId,
+      userId,
+      totalScore: feedback.totalScore,
+      categoryScores: feedback.categoryScores,
+      strengths: feedback.strengths,
+      areasForImprovement: feedback.areasForImprovement,
+      finalAssessment: feedback.finalAssessment,
+    });
+
+   return {
+    success:true ,
+    feedbackId: savedFeedback._id.toString() ,
+
+   };
+   
+    }catch(e){
+         console.error("Error creating feedback:", e);
+
+  // return fallback feedback instead of crashing
+
+      return {
+        success:false  ,
+        feedbackId: null,
+      }
+    }
+}
+
+
+//function for getting the feedback by interviewId and userid from the database
+export async function getFeedbackByInterviewId(params : GetFeedbackByInterviewIdParams):Promise<FeedbackType | null>{
+
+    const {interviewId , userId} = params;
+     await dbConnect();
+
+     //get the feedback from the database
+     const feedback= await Feedback.findOne({
+        interviewId:interviewId ,
+        userId: userId
+     });
+
+     if(!feedback) return null;
+
+     return feedback;
+
+
+
+
+   
 }

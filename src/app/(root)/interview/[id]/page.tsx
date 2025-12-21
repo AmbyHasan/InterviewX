@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 
-
+//for generating the interview based on the userId
 
 const page = async({params}: RouteParams) => {
     const {id} = await params;
@@ -41,7 +41,7 @@ const page = async({params}: RouteParams) => {
     </div>
     <Agent
 
-    userName={user?.name}
+    userName={user?.name || ' '}
     userId={user?._id.toString()}
     interviewId={id}
     type="interview"

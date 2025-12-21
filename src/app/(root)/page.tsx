@@ -25,7 +25,7 @@ const page = async() => {
    <div className="flex flex-col gap-6 max-w-sm">
     <h2>Ace Your Interview with Smart AI Practice & Real-Time Feedback</h2>
     <p className="text-lg">
-      Practice on real interview questios and get instant feedback
+      Practice on real interview questions and get instant feedback
     </p>
     <Button asChild className="btn-primary max-sm:w-full">
       <Link href="/interview">Start an interview</Link>
@@ -50,7 +50,7 @@ const page = async() => {
                userId={interview.userId.toString()}
                role={interview.role}
                type={interview.type}
-              techstack={interview.techstack}
+               techstack={interview.techstack}
                createdAt={interview.createdAt.toString()}
                key={interview._id.toString()}
               

@@ -1,6 +1,8 @@
 import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
 import { z } from "zod";
 
+
+//mappings for the interviewee responses when the ai asks the for the techstack they are intersted to be interviewed in
 export const mappings = {
   "react.js": "react",
   reactjs: "react",
@@ -97,10 +99,12 @@ export const mappings = {
   "aws amplify": "amplify",
 };
 
+
+
 export const interviewer: CreateAssistantDTO = {
   name: "Interviewer",
   firstMessage:
-    "Hello! Thank you for taking the time to speak with me today. I'm excited to learn more about you and your experience.",
+  "Hello! Thank you for taking the time to speak with me today. I'm excited to learn more about you and your experience.",
   transcriber: {
     provider: "deepgram",
     model: "nova-2",
@@ -126,6 +130,10 @@ export const interviewer: CreateAssistantDTO = {
 Interview Guidelines:
 Follow the structured question flow:
 {{questions}}
+
+Ask the only questions which are in {{questions}}
+Do not generate any question by yourself
+If the candidate does not give answer to any question then end the interview kindly
 
 Engage naturally & react appropriately:
 Listen actively to responses and acknowledge them before moving forward.
@@ -155,35 +163,26 @@ End the conversation on a polite and positive note.
   },
 };
 
+
+
+//this is the schema which the AI needs to obey while returing the feedback of the interview
 export const feedbackSchema = z.object({
   totalScore: z.number(),
-  categoryScores: z.tuple([
-    z.object({
-      name: z.literal("Communication Skills"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Technical Knowledge"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Problem Solving"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Cultural Fit"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Confidence and Clarity"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-  ]),
+  categoryScores:z
+    .array(
+      z.object({
+        name: z.enum([
+          "Communication Skills",
+          "Technical Knowledge",
+          "Problem Solving",
+          "Cultural Fit",
+          "Confidence and Clarity",
+        ]),
+        score: z.number(),
+        comment: z.string(),
+      })
+    )
+    .length(5),
   strengths: z.array(z.string()),
   areasForImprovement: z.array(z.string()),
   finalAssessment: z.string(),

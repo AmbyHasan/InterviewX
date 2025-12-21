@@ -1,8 +1,9 @@
 import NextAuth, { DefaultSession } from "next-auth";
 
-interface Feedback {
+interface FeedbackType {
   id: string;
   interviewId: string;
+  userId:string;
   totalScore: number;
   categoryScores: Array<{
     name: string;
@@ -13,6 +14,12 @@ interface Feedback {
   areasForImprovement: string[];
   finalAssessment: string;
   createdAt: string;
+}
+
+interface Category{
+  name: "Communication Skills" | "Technical Knowledge" | "Problem Solving" | "Cultural Fit" | "Confidence and Clarity";
+  score: number;
+ comment:string;
 }
 
 
@@ -49,6 +56,8 @@ interface AgentProps {
   questions?: string[];
 }
 
+
+//for the route of feedback page
 interface RouteParams {
   params: Promise<Record<string, string>>;
   searchParams: Promise<Record<string, string>>;

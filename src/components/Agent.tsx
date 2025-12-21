@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { vapi } from '../lib/vapi';
 import { cn } from '../lib/utils';
 import { interviewer } from '../constants';
+import { createFeedBack } from '../lib/action';
+import { toast } from 'sonner';
 
 
 
@@ -78,23 +80,27 @@ const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
       console.log("Generate Feedback here");
 
        //mock message
-      const {success , id}={
-        success:true ,
-        id: "feedback-id"
+      const {success , feedbackId}=await createFeedBack({
+          interviewId: interviewId!,
+          userId: userId! , 
+          transcript:messages
+      })
+       
 
-      }
+      
 
-      if(success && id){
+      if(success && interviewId){
           router.push(`/interview/${interviewId}/feedback`)
       }else{
         console.log("Error saving feedback");
+        toast.error("Failed to generate feedback. Please try again.");
         router.push("/");
       }
   }
 
   //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
- //after the call ends take the user back to the home page so that they can see their fully generated interview
+ //after the call ends, take the user back to the home page so that they can see their fully generated interview
   useEffect(()=>{
       if(callStatus===CallStatus.FINISHED){
         //generate the interview and push the user to the home page
@@ -116,11 +122,11 @@ const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
     setCallStatus(CallStatus.CONNECTING);
 
     console.log("Sending to VAPI:", {
-   username: userName,
+     username: userName,
      userid: userId
     });
 
-
+   //here we the assistant is generating the interview questions after taking the response from the user
    if(type==="generate"){
        await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID ,{
        variableValues:{
@@ -129,6 +135,8 @@ const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
        }
     });
    }else{
+    //the inteviewer will ask the questions from the user on the call
+
 
     //we will provide the array of questions for the interviewer to ask
     let formattedQuestions="";
@@ -137,10 +145,10 @@ const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
 
        formattedQuestions=questions.map((question)=>`-${question}`).join('\n');
          }
-    
+    //based on the above questions we will generate a new vapi call
     await vapi.start(interviewer ,{
       variableValues:{
-      questions:formattedQuestions
+      questions:formattedQuestions //list of questions
       }
     })
     
@@ -152,7 +160,7 @@ const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
     
   }
  
-  //dissconnecting the call
+  //disconnecting the call
   const handleDisconnect=async()=>{
    setCallStatus(CallStatus.FINISHED);
    vapi.stop();
@@ -199,7 +207,7 @@ const Agent = ({userName ,userId ,type ,interviewId ,questions}:AgentProps) => {
 
 
        {callStatus !== CallStatus.ACTIVE ? (
-     <button className="relative btn-call" onClick={handleCall}>
+     <button className="relative btn-call " onClick={handleCall}>
       <span className={cn('absolute animate-ping rounded-full opacity-75' , callStatus!=='CONNECTING' && 'hidden')}/>
       <span>
     {isCallInactiveOrFinished ? 'Call' : '...'}
