@@ -71,6 +71,7 @@ It is designed for **students, job seekers, and professionals** looking to impro
 
 ```bash
 npm install
+```
 
 
 ### 2️⃣Create Environment Variables
@@ -141,6 +142,8 @@ src/
 ├── components.json
 ├── eslint.config.mjs
 └── image.png
+
+```
 
 ## 🧩 Key Components
 
