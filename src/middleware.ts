@@ -4,13 +4,27 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
   const url = request.nextUrl;
+  const pathname = url.pathname;
 
   const isAuthPage =
-    url.pathname.startsWith("/sign-in") ||
-    url.pathname.startsWith("/sign-up");
+    pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/sign-up");
 
-  const protectedRoutes = ["/", "/interview" ,"/authenticatedLandingPage" , "interview/:id/feedback" ,"/interview/:id"];
-  const isProtected = protectedRoutes.includes(url.pathname);
+  const protectedRoutePrefixes = [
+    "/authenticatedLandingPage",
+    "/interview",
+    "/my-resume",
+    "/tools",
+    "/ai-chat/history",
+    "/ai-roadmap/history",
+  ];
+
+  const isProtected =
+    pathname === "/" ||
+    protectedRoutePrefixes.some(
+      (routePrefix) =>
+        pathname === routePrefix || pathname.startsWith(`${routePrefix}/`)
+    );
 
   // Always allow auth pages
   if (isAuthPage) return NextResponse.next();
